@@ -406,7 +406,7 @@ public struct Attributes {
     }
 }
 
-public final class Keychain {
+public actor Keychain {
     public var itemClass: ItemClass {
         return options.itemClass
     }
@@ -881,7 +881,7 @@ public final class Keychain {
 
     // MARK:
 
-    public class func allKeys(_ itemClass: ItemClass) -> [(String, String)] {
+    public static func allKeys(_ itemClass: ItemClass) -> [(String, String)] {
         var query = [String: Any]()
         query[Class] = itemClass.rawValue
         query[AttributeSynchronizable] = SynchronizableAny
@@ -923,7 +923,7 @@ public final class Keychain {
         #endif
     }
 
-    public class func allItems(_ itemClass: ItemClass) -> [[String: Any]] {
+    public static func allItems(_ itemClass: ItemClass) -> [[String: Any]] {
         var query = [String: Any]()
         query[Class] = itemClass.rawValue
         query[MatchLimit] = MatchLimitAll
@@ -1029,28 +1029,28 @@ public final class Keychain {
 
     #if os(iOS) && !targetEnvironment(macCatalyst)
     @available(iOS 8.0, *)
-    public class func requestSharedWebCredential(_ completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> () = { credentials, error -> () in }) {
+    public static func requestSharedWebCredential(_ completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> () = { credentials, error -> () in }) {
         requestSharedWebCredential(domain: nil, account: nil, completion: completion)
     }
     #endif
 
     #if os(iOS) && !targetEnvironment(macCatalyst)
     @available(iOS 8.0, *)
-    public class func requestSharedWebCredential(domain: String, completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> () = { credentials, error -> () in }) {
+    public static func requestSharedWebCredential(domain: String, completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> () = { credentials, error -> () in }) {
         requestSharedWebCredential(domain: domain, account: nil, completion: completion)
     }
     #endif
 
     #if os(iOS) && !targetEnvironment(macCatalyst)
     @available(iOS 8.0, *)
-    public class func requestSharedWebCredential(domain: String, account: String, completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> () = { credentials, error -> () in }) {
+    public static func requestSharedWebCredential(domain: String, account: String, completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> () = { credentials, error -> () in }) {
         requestSharedWebCredential(domain: Optional(domain), account: Optional(account)!, completion: completion)
     }
     #endif
 
     #if os(iOS) && !targetEnvironment(macCatalyst)
     @available(iOS 8.0, *)
-    fileprivate class func requestSharedWebCredential(domain: String?, account: String?, completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> ()) {
+    fileprivate static func requestSharedWebCredential(domain: String?, account: String?, completion: @escaping (_ credentials: [[String: String]], _ error: Error?) -> ()) {
         SecRequestSharedWebCredential(domain as CFString?, account as CFString?) { (credentials, error) -> () in
             var remoteError: NSError?
             if let error = error {
@@ -1089,7 +1089,7 @@ public final class Keychain {
      @return String password in the form xxx-xxx-xxx-xxx where x is taken from the sets "abcdefghkmnopqrstuvwxy", "ABCDEFGHJKLMNPQRSTUVWXYZ", "3456789" with at least one character from each set being present.
      */
     @available(iOS 8.0, *)
-    public class func generatePassword() -> String {
+    public static func generatePassword() -> String {
         return SecCreateSharedWebCredentialPassword()! as String
     }
     #endif
@@ -1121,7 +1121,7 @@ public final class Keychain {
         return []
     }
 
-    fileprivate class func prettify(itemClass: ItemClass, items: [[String: Any]]) -> [[String: Any]] {
+    fileprivate static func prettify(itemClass: ItemClass, items: [[String: Any]]) -> [[String: Any]] {
         let items = items.map { attributes -> [String: Any] in
             var item = [String: Any]()
 
@@ -1180,7 +1180,7 @@ public final class Keychain {
     // MARK:
 
     @discardableResult
-    fileprivate class func securityError(status: OSStatus) -> Error {
+    fileprivate static func securityError(status: OSStatus) -> Error {
         let error = Status(status: status)
         if error != .userCanceled {
             print("OSStatus error:[\(error.errorCode)] \(error.description)")
@@ -1299,8 +1299,8 @@ private let SharedPassword = String(kSecSharedPassword)
 #endif
 
 extension Keychain: CustomStringConvertible, CustomDebugStringConvertible {
-    public var description: String {
-        let items = allItems()
+    nonisolated public var description: String {
+        let items = [[String: Any]]() //allItems()
         if items.isEmpty {
             return "[]"
         }
@@ -1313,8 +1313,8 @@ extension Keychain: CustomStringConvertible, CustomDebugStringConvertible {
         return description
     }
 
-    public var debugDescription: String {
-        return "\(items())"
+    nonisolated public var debugDescription: String {
+        return ""//"\(items())"
     }
 }
 
